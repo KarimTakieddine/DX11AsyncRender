@@ -1,34 +1,31 @@
-#include <windows.h>
-
-#include "graphics_device.h"
+#include "renderer.h"
 #include "win32_window.h"
 
 int main()
 {
-    // ShowWindow(windowHandle, SW_SHOWDEFAULT);
-    // UpdateWindow(windowHandle);
-
     airful_engine::Win32Window window("Hello, World!", 640, 480);
+    window.show();
+    window.update();
 
-    airful_engine::GraphicsDevice graphicsDevice(
-        window.getHandle(),
-        640,
-        480,
-        60,
-        DXGI_FORMAT_R8G8B8A8_UNORM
-    );
+    airful_engine::Renderer renderer;
 
-    //MSG msg = { 0 };
-    //while (msg.message != WM_QUIT) {
-    //    // Handle window events (like closing or resizing)
-    //    if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE)) {
-    //        TranslateMessage(&msg);
-    //        DispatchMessage(&msg);
-    //        continue; // Continue loop to check WM_QUIT
-    //    }
-    //}
+    renderer.run(window.getHandle(), { 640U, 480U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
 
-    // UnregisterClassA("hello_dx11_world_window", instance);
+    MSG msg = { 0 };
+    while (msg.message != WM_QUIT) {
+        // Handle window events (like closing or resizing)
+        if (PeekMessage(&msg, NULL, 0U, 0U, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else
+        {
+
+        }
+    }
+
+    renderer.stop();
 
     return 0;
 }

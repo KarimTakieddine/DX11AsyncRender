@@ -4,7 +4,7 @@
 
 namespace airful_engine
 {
-	GraphicsDevice::GraphicsDevice(HWND window, UINT width, UINT height, UINT refreshRate, DXGI_FORMAT format)
+	GraphicsDevice::GraphicsDevice(HWND window, const GraphicsConfig& config)
 	{
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = { };
 
@@ -12,13 +12,13 @@ namespace airful_engine
 		swapChainDesc.SwapEffect	= DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 		swapChainDesc.BufferDesc = {
-			.Width	= width,
-			.Height	= height,
-			.Format	= format
+			.Width	= config.width,
+			.Height	= config.height,
+			.Format	= config.format
 		};
 
 		swapChainDesc.BufferDesc.RefreshRate = {
-			.Numerator		= refreshRate,
+			.Numerator		= config.fps,
 			.Denominator	= 1
 		};
 
@@ -117,5 +117,20 @@ namespace airful_engine
 		*/
 
 		m_context->OMSetRenderTargets(1, m_backBufferView.GetAddressOf(), NULL);
+	}
+
+	ComPtr<ID3D11DeviceContext> GraphicsDevice::getContext() const
+	{
+		return m_context;
+	}
+
+	ComPtr<IDXGISwapChain> GraphicsDevice::getSwapChain() const
+	{
+		return m_swapChain;
+	}
+
+	ComPtr<ID3D11RenderTargetView> GraphicsDevice::getBackBufferView() const
+	{
+		return m_backBufferView;
 	}
 }

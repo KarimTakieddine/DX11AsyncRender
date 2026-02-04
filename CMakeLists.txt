@@ -10,6 +10,8 @@ set(SRC_DIR src)
 
 set(SOURCES DX11AsyncRender.cpp
 	${SRC_DIR}/graphics_device.cpp
+	${SRC_DIR}/platform_win32.cpp
+	${SRC_DIR}/renderer.cpp
 	${SRC_DIR}/win32_window.cpp
 )
 

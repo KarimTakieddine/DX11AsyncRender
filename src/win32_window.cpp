@@ -93,4 +93,14 @@ namespace airful_engine
     {
         return m_handle;
     }
+
+    BOOL Win32Window::show()
+    {
+        return ShowWindow(m_handle, SW_SHOW);
+    }
+
+    BOOL Win32Window::update()
+    {
+        return UpdateWindow(m_handle);
+    }
 }

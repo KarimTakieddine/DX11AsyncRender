@@ -1,6 +1,6 @@
 #pragma once
 
-#include <windows.h>
+#include <Windows.h>
 
 namespace airful_engine
 {
@@ -15,6 +15,10 @@ namespace airful_engine
 		~Win32Window();
 
 		HWND getHandle() const;
+
+		BOOL show();
+
+		BOOL update();
 
 	private:
 		HWND m_handle{ NULL };
