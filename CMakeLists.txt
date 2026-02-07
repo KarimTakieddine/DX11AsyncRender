@@ -10,6 +10,8 @@ set(SRC_DIR src)
 set(SHADERS_DIR shaders)
 
 set(SOURCES DX11AsyncRender.cpp
+    ${SRC_DIR}/d3d11_shader.cpp
+    ${SRC_DIR}/d3d11_shader_store.cpp
 	${SRC_DIR}/graphics_device.cpp
 	${SRC_DIR}/platform_win32.cpp
 	${SRC_DIR}/renderer.cpp
@@ -48,8 +50,8 @@ function(compile_shaders shader_files shader_type shader_model)
 	endforeach(SHADER_FILE)
 endfunction()
 
-compile_shaders(${VERTEX_SHADERS} vs 5_1)
-compile_shaders(${PIXEL_SHADERS} ps 5_1)
+compile_shaders(${VERTEX_SHADERS} vs 5_0)
+compile_shaders(${PIXEL_SHADERS} ps 5_0)
 
 add_custom_target(Shaders DEPENDS ${SHADERS})
 

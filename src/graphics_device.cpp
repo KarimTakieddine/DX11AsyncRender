@@ -110,13 +110,6 @@ namespace airful_engine
 			// TODO(Karim): General function for mapping GetLastError() to string
 			throw std::runtime_error("Failed to create render target view");
 		}
-
-		/*
-		* Bind one or more render targets atomically and the depth-stencil buffer to the
-		* output-merger stage.
-		*/
-
-		m_context->OMSetRenderTargets(1, m_backBufferView.GetAddressOf(), NULL);
 	}
 
 	ComPtr<ID3D11DeviceContext> GraphicsDevice::getContext() const
@@ -132,5 +125,31 @@ namespace airful_engine
 	ComPtr<ID3D11RenderTargetView> GraphicsDevice::getBackBufferView() const
 	{
 		return m_backBufferView;
+	}
+
+	ComPtr<ID3D11Device> GraphicsDevice::getDevice() const
+	{
+		return m_device;
+	}
+
+	void GraphicsDevice::setViewport(float width, float height)
+	{
+		D3D11_VIEWPORT viewport = {
+			.TopLeftX	= 0.0f,
+			.TopLeftY	= 0.0f,
+			.Width		= width,
+			.Height		= height
+		};
+
+		m_context->RSSetViewports(1, &viewport);
+	}
+	void GraphicsDevice::targetBackBuffer()
+	{
+		/*
+		* Bind one or more render targets atomically and the depth-stencil buffer to the
+		* output-merger stage.
+		*/
+
+		m_context->OMSetRenderTargets(1, m_backBufferView.GetAddressOf(), NULL);
 	}
 }

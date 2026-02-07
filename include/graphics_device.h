@@ -18,11 +18,13 @@ namespace airful_engine
 		GraphicsDevice(const GraphicsDevice&) = delete;
 		GraphicsDevice& operator=(const GraphicsDevice&) = delete;
 
+		ComPtr<ID3D11Device> getDevice() const;
 		ComPtr<ID3D11DeviceContext> getContext() const;
-
 		ComPtr<IDXGISwapChain> getSwapChain() const;
-
 		ComPtr<ID3D11RenderTargetView> getBackBufferView() const;
+
+		void setViewport(float width, float height);
+		void targetBackBuffer();
 
 	private:
 		ComPtr<ID3D11Device> m_device					{ nullptr };

@@ -2,7 +2,7 @@
 struct VSInput
 {
     float3 position : POSITION; // Vertex Position (X, Y, Z)
-    float3 color : COLOR0; // Vertex Color (R, G, B)
+    float4 color : COLOR0; // Vertex Color (R, G, B, A)
 };
 
 // Output structure to the pixel shader
@@ -27,8 +27,7 @@ VSOutput Main(VSInput input)
     // output.position = mul(float4(input.position, 1.0f), wvp);
 
     // 2. Pass the color through
-    // Convert float3 color to float4 (Alpha = 1.0f)
-    output.color = float4(input.color, 1.0f);
+    output.color = input.color;
 
     return output;
 }
