@@ -6,13 +6,12 @@
 
 #include <Windows.h>
 
+#include "d3d11_shader_store.h"
 #include "graphics_device.h"
 #include "timer.h"
 
 namespace airful_engine
 {
-	class GraphicsDevice;
-
 	class Renderer
 	{
 	public:
@@ -30,6 +29,7 @@ namespace airful_engine
 
 		std::thread m_runThread;
 		std::unique_ptr<GraphicsDevice> m_graphicsDevice{ nullptr };
+		std::unique_ptr<D3D11ShaderStore> m_shaderStore{ nullptr };
 		Timer m_frameTimer;
 		std::atomic<bool> m_shouldRun{ true };
 	};
