@@ -14,12 +14,25 @@ namespace
     */
     static HINSTANCE applicationInstance = GetModuleHandle(NULL);
 
+    airful_engine::Win32Window* getWindow(LPARAM lParam)
+    {
+       return (airful_engine::Win32Window*)( (CREATESTRUCT*)lParam )->lpCreateParams;
+    }
+
     LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         switch (msg) {
+        case WM_NCCREATE:
+        {
+            SetWindowLongPtrA(hWnd, 0, (LONG_PTR)getWindow(lParam));
+            break;
+        }
         case WM_SIZE:
-            // Handle resizing DX11 buffers here
+        {
+            auto* window = (airful_engine::Win32Window*)GetWindowLongPtrA(hWnd, 0);
+            window->handleResize(LOWORD(lParam), HIWORD(lParam));
             return 0;
+        }
         case WM_KEYDOWN:
             if (wParam == VK_ESCAPE) PostQuitMessage(0);
             return 0;
@@ -48,7 +61,7 @@ namespace airful_engine
             windowConfig.style          = CS_HREDRAW | CS_VREDRAW;
             windowConfig.lpfnWndProc    = &::WndProc;
             windowConfig.cbClsExtra     = 0;
-            windowConfig.cbWndExtra     = 0;
+            windowConfig.cbWndExtra     = sizeof(LONG_PTR);
             windowConfig.hInstance      = applicationInstance;
             windowConfig.hIconSm        = NULL;
             windowConfig.hIcon          = NULL;
@@ -71,7 +84,7 @@ namespace airful_engine
             NULL,
             NULL,
             applicationInstance,
-            nullptr);
+            this);
 
         if (windowHandle == NULL)
         {
@@ -102,5 +115,22 @@ namespace airful_engine
     BOOL Win32Window::update()
     {
         return UpdateWindow(m_handle);
+    }
+
+    BOOL Win32Window::handleResize(UINT width, UINT height)
+    {
+        enqueueMessage(
+            {
+                MessageType::RESIZE,
+                ( (static_cast<uint64_t>(width) & 0xFFFFFFFF) << 32 ) | height });
+
+        return TRUE;
+    }
+
+    void Win32Window::enqueueMessage(const Message& message)
+    {
+        std::lock_guard<std::mutex> lock(m_messageQueueMutex);
+
+        m_messageQueue.push_back(message);
     }
 }

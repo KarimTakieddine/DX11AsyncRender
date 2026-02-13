@@ -12,6 +12,8 @@
 
 namespace airful_engine
 {
+	class Win32Window;
+
 	class Renderer
 	{
 	public:
@@ -20,7 +22,7 @@ namespace airful_engine
 		Renderer(const Renderer&) = delete;
 		Renderer& operator=(const Renderer&) = delete;
 
-		void run(HWND window, const GraphicsConfig& config);
+		void run(Win32Window* window, const GraphicsConfig& config);
 		void stop();
 
 	private:
@@ -28,9 +30,11 @@ namespace airful_engine
 		void execute(HWND window, const GraphicsConfig& config);
 
 		std::thread m_runThread;
-		std::unique_ptr<GraphicsDevice> m_graphicsDevice{ nullptr };
-		std::unique_ptr<D3D11ShaderStore> m_shaderStore{ nullptr };
 		Timer m_frameTimer;
-		std::atomic<bool> m_shouldRun{ true };
+		std::unique_ptr<GraphicsDevice> m_graphicsDevice{ nullptr };
+		std::unique_ptr<D3D11ShaderStore> m_shaderStore	{ nullptr };
+		Win32Window* m_window							{ nullptr };
+		std::atomic<uint64_t> m_renderedFrameCount		{ 0 };
+		std::atomic<bool> m_shouldRun					{ true };
 	};
 }

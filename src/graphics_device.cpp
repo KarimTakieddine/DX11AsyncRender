@@ -71,7 +71,7 @@ namespace airful_engine
 		HRESULT status = D3D11CreateDeviceAndSwapChain(
 			NULL,
 			D3D_DRIVER_TYPE_HARDWARE, NULL,
-			D3D11_CREATE_DEVICE_DEBUG,
+			0,
 			targetArray, 1,
 			D3D11_SDK_VERSION,
 			&swapChainDesc, &m_swapChain,
@@ -96,7 +96,7 @@ namespace airful_engine
 			status = D3D11CreateDeviceAndSwapChain(
 				NULL,
 				D3D_DRIVER_TYPE_HARDWARE, NULL,
-				D3D11_CREATE_DEVICE_DEBUG,
+				0,
 				NULL, 0,
 				D3D11_SDK_VERSION,
 				&swapChainDesc, &m_swapChain,

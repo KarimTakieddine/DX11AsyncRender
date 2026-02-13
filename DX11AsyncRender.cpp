@@ -8,7 +8,7 @@ int main()
     window.update();
 
     airful_engine::Renderer renderer;
-    renderer.run(window.getHandle(), { 640U, 480U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
+    renderer.run(&window, { 640U, 480U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
 
     bool shouldRun{ true };
 

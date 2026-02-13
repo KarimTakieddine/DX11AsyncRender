@@ -1,12 +1,14 @@
 #include "d3d11_render_batch.h"
 #include "platform.h"
 #include "renderer.h"
+#include "win32_window.h"
 
 namespace airful_engine
 {
-	void Renderer::run(HWND window, const GraphicsConfig& config)
+	void Renderer::run(Win32Window* window, const GraphicsConfig& config)
 	{
-		m_runThread = std::thread(&Renderer::execute, this, window, config);
+		m_window	= window;
+		m_runThread = std::thread(&Renderer::execute, this, window->getHandle(), config);
 	}
 
 	void Renderer::stop()
@@ -76,9 +78,15 @@ namespace airful_engine
 			if (m_graphicsDevice->getSwapChain()->GetFrameStatistics(&frameStatistics) == S_OK)
 				m_frameTimer.end = frameStatistics.SyncQPCTime.QuadPart;
 
-			displacement.x += 0.25 * platformGetElapsedSeconds(m_frameTimer);
+			double frameDeltaTime = platformGetElapsedSeconds(m_frameTimer);
+
+			displacement.x += 0.25 * frameDeltaTime;
 
 			m_frameTimer.start = m_frameTimer.end;
+
+			m_renderedFrameCount.store(
+				m_renderedFrameCount.load(std::memory_order_relaxed) + 1,
+				std::memory_order_release);
 		}
 	}
 }
