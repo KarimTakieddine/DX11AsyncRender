@@ -2,6 +2,8 @@
 
 #include "graphics_device.h"
 
+#include <dxgidebug.h>
+
 namespace airful_engine
 {
 	GraphicsDevice::GraphicsDevice(HWND window, const GraphicsConfig& config)
@@ -69,47 +71,45 @@ namespace airful_engine
 		HRESULT status = D3D11CreateDeviceAndSwapChain(
 			NULL,
 			D3D_DRIVER_TYPE_HARDWARE, NULL,
-			0,
+			D3D11_CREATE_DEVICE_DEBUG,
 			targetArray, 1,
 			D3D11_SDK_VERSION,
-			&swapChainDesc, m_swapChain.GetAddressOf(),
-			m_device.GetAddressOf(),
+			&swapChainDesc, &m_swapChain,
+			&m_device,
 			&featureLevel,
-			m_context.GetAddressOf());
+			&m_context);
 
-		if (status == E_INVALIDARG)
+		if (status == E_INVALIDARG || featureLevel != D3D_FEATURE_LEVEL_11_1)
 		{
-			HRESULT status = D3D11CreateDeviceAndSwapChain(
+			/*
+			* Fall back to the following array of feature levels:
+			*	{
+			*		D3D_FEATURE_LEVEL_11_0,
+			*		D3D_FEATURE_LEVEL_10_1,
+			*		D3D_FEATURE_LEVEL_10_0,
+			*		D3D_FEATURE_LEVEL_9_3,
+			*		D3D_FEATURE_LEVEL_9_2,
+			*		D3D_FEATURE_LEVEL_9_1,
+			*	};
+			*/
+
+			status = D3D11CreateDeviceAndSwapChain(
 				NULL,
 				D3D_DRIVER_TYPE_HARDWARE, NULL,
-				0,
-				NULL, 1,
+				D3D11_CREATE_DEVICE_DEBUG,
+				NULL, 0,
 				D3D11_SDK_VERSION,
-				&swapChainDesc, m_swapChain.GetAddressOf(),
-				m_device.GetAddressOf(),
+				&swapChainDesc, &m_swapChain,
+				&m_device,
 				&featureLevel,
-				m_context.GetAddressOf());
+				&m_context);
 		}
 
 		if (status != S_OK || ( featureLevel != D3D_FEATURE_LEVEL_11_0 && featureLevel != D3D_FEATURE_LEVEL_11_1 ))
-		{
 			// TODO(Karim): General function for mapping GetLastError() to string
 			throw std::runtime_error("Failed to create GraphicsDevice");
-		}
 
-		ID3D11Texture2D* pBackBuffer{ nullptr };
-
-		if (m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer) != S_OK)
-		{
-			// TODO(Karim): General function for mapping GetLastError() to string
-			throw std::runtime_error("Failed to get back buffer");
-		}
-
-		if (m_device->CreateRenderTargetView(pBackBuffer, NULL, m_backBufferView.GetAddressOf()) != S_OK)
-		{
-			// TODO(Karim): General function for mapping GetLastError() to string
-			throw std::runtime_error("Failed to create render target view");
-		}
+		createRenderTargetView();
 	}
 
 	ComPtr<ID3D11DeviceContext> GraphicsDevice::getContext() const
@@ -143,6 +143,22 @@ namespace airful_engine
 
 		m_context->RSSetViewports(1, &viewport);
 	}
+
+	void GraphicsDevice::createRenderTargetView()
+	{
+		ID3D11Texture2D* pBackBuffer{ nullptr };
+
+		if (m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&pBackBuffer) != S_OK)
+			// TODO(Karim): General function for mapping GetLastError() to string
+			throw std::runtime_error("GraphicsDevice::createRenderTargetView: Failed to get back buffer");
+
+		if (m_device->CreateRenderTargetView(pBackBuffer, NULL, &m_backBufferView) != S_OK)
+			// TODO(Karim): General function for mapping GetLastError() to string
+			throw std::runtime_error("GraphicsDevice::createRenderTargetView: Failed to create render target view");
+
+		pBackBuffer->Release();
+	}
+
 	void GraphicsDevice::targetBackBuffer()
 	{
 		/*
@@ -151,5 +167,29 @@ namespace airful_engine
 		*/
 
 		m_context->OMSetRenderTargets(1, m_backBufferView.GetAddressOf(), NULL);
+	}
+
+	void GraphicsDevice::resizeBuffers(UINT width, UINT height)
+	{
+		releaseBufferResources();
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = { };
+		if (m_swapChain->GetDesc(&swapChainDesc) != S_OK)
+			throw std::runtime_error("GraphicsDevice::resizeBuffers: Current swap chain is invalid");
+
+		if (m_swapChain->ResizeBuffers(swapChainDesc.BufferCount, width, height, DXGI_FORMAT_UNKNOWN, 0) != S_OK)
+			throw std::runtime_error("GraphicsDevice::resizeBuffers: Failed to resize swap chain buffers");
+
+		createRenderTargetView();
+		targetBackBuffer();
+	}
+
+	void GraphicsDevice::releaseBufferResources()
+	{
+		ID3D11RenderTargetView* nullViews[] = { nullptr };
+		m_context->OMSetRenderTargets(1, nullViews, nullptr);
+		m_backBufferView.Reset();
+		m_context->ClearState();
+		m_context->Flush();
 	}
 }

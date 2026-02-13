@@ -49,6 +49,9 @@ namespace airful_engine
 		renderBatch.setPixelShader(m_shaderStore->getPixelShader("vertex_transform_p"));
 		renderBatch.initialize();
 
+		D3D11Transform transform;
+		DirectX::XMFLOAT3 displacement{ 0.0f, 0.0f, 0.0f };
+
 		while (m_shouldRun.load(std::memory_order_acquire))
 		{
 			float clearColor[] = { 1.0f, 0.71f, 0.76f, 1.0f };
@@ -60,7 +63,10 @@ namespace airful_engine
 				clearColor);
 
 			renderBatch.use();
-			renderBatch.setTransformData(D3D11Transform());
+			transform.setLocalScale({ 0.25f, 0.25f, 1.0f });
+			transform.translate(displacement);
+			transform.recalculateModelMatrix();
+			renderBatch.setTransformData(transform);
 
 			m_graphicsDevice->getContext()->Draw(3, 0);
 
@@ -69,6 +75,8 @@ namespace airful_engine
 			DXGI_FRAME_STATISTICS frameStatistics = { };
 			if (m_graphicsDevice->getSwapChain()->GetFrameStatistics(&frameStatistics) == S_OK)
 				m_frameTimer.end = frameStatistics.SyncQPCTime.QuadPart;
+
+			displacement.x += 0.25 * platformGetElapsedSeconds(m_frameTimer);
 
 			m_frameTimer.start = m_frameTimer.end;
 		}
