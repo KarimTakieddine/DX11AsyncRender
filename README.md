@@ -10,7 +10,7 @@ Oh, and while we have experienced great success along the way, at the moment it'
 
 ### But look how smooth! (minus some ScreenToGif recording lag :D)
 
-![](demo/triangle.gif)
+![](demo/triangle.mp4)
 
 # Building
 
