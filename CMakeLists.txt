@@ -18,6 +18,7 @@ set(SOURCES DX11AsyncRender.cpp
 	${SRC_DIR}/platform_win32.cpp
 	${SRC_DIR}/renderer.cpp
 	${SRC_DIR}/win32_window.cpp
+    "${CMAKE_CURRENT_SOURCE_DIR}/app.manifest"
 )
 
 add_executable(DX11AsyncRender ${SOURCES})

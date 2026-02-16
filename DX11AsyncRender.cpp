@@ -3,12 +3,12 @@
 
 int main()
 {
-    airful_engine::Win32Window window("Hello, World!", 640, 480);
+    airful_engine::Win32Window window("Hello, World!", 1920, 1080);
     window.show();
     window.update();
 
     airful_engine::Renderer renderer;
-    renderer.run(&window, { 640U, 480U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
+    renderer.run(&window, { 1920U, 1080U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
 
     bool shouldRun{ true };
 

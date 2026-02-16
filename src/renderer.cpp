@@ -56,6 +56,26 @@ namespace airful_engine
 
 		while (m_shouldRun.load(std::memory_order_acquire))
 		{
+			Win32Window::Message windowMessage = { };
+			while (m_window->dequeMessage(windowMessage))
+			{
+				switch (windowMessage.type)
+				{
+				case Win32Window::MessageType::RESIZE:
+				{
+					UINT width	= static_cast<UINT>( (windowMessage.data & 0xFFFFFFFF00000000) >> 32 );
+					UINT height	= static_cast<UINT>( (windowMessage.data & 0xFFFFFFFF) );
+
+					m_graphicsDevice->resizeBuffers(width, height);
+					m_graphicsDevice->setViewport(static_cast<float>(width), static_cast<float>(height));
+
+					break;
+				}
+				default:
+					break;
+				}
+			}
+
 			float clearColor[] = { 1.0f, 0.71f, 0.76f, 1.0f };
 
 			m_graphicsDevice->targetBackBuffer();
@@ -80,7 +100,7 @@ namespace airful_engine
 
 			double frameDeltaTime = platformGetElapsedSeconds(m_frameTimer);
 
-			displacement.x += 0.25 * frameDeltaTime;
+			displacement.x += 0.125 * frameDeltaTime;
 
 			m_frameTimer.start = m_frameTimer.end;
 

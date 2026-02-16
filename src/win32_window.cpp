@@ -117,12 +117,27 @@ namespace airful_engine
         return UpdateWindow(m_handle);
     }
 
-    BOOL Win32Window::handleResize(UINT width, UINT height)
+    void Win32Window::handleResize(UINT width, UINT height)
     {
         enqueueMessage(
             {
                 MessageType::RESIZE,
-                ( (static_cast<uint64_t>(width) & 0xFFFFFFFF) << 32 ) | height });
+                ( (static_cast<uint64_t>(width) & 0xFFFFFFFF) << 32 ) | height
+            });
+    }
+
+    BOOL Win32Window::dequeMessage(Message& message)
+    {
+        // TODO(Karim): Replace with 64 bit atomic - type (32) + width(16) + height(16)
+
+        std::lock_guard<std::mutex> lock(m_messageQueueMutex);
+
+        if (m_messageQueue.empty())
+            return FALSE;
+
+        message = m_messageQueue.front();
+
+        m_messageQueue.pop_front();
 
         return TRUE;
     }

@@ -1,0 +1,10 @@
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <!-- PerMonitorV2 is the gold standard for Win32 (Windows 10 1703+) -->
+      <dpiAwareness xmlns="http://schemas.microsoft.com">PerMonitorV2, PerMonitor</dpiAwareness>
+      <!-- Fallback for older Windows versions -->
+      <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
+    </windowsSettings>
+  </application>
+</assembly>

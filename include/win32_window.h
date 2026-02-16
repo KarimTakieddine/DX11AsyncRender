@@ -35,7 +35,9 @@ namespace airful_engine
 
 		BOOL update();
 
-		BOOL handleResize(UINT width, UINT height);
+		void handleResize(UINT width, UINT height);
+
+		BOOL dequeMessage(Message& message);
 
 	private:
 		void enqueueMessage(const Message& message);
