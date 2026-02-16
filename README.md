@@ -10,7 +10,7 @@ Oh, and while we have experienced great success along the way, at the moment it'
 
 ### But look how smooth! (minus some ScreenToGif recording lag :D)
 
-![](demo/triangle.mp4)
+https://github.com/user-attachments/assets/a37dbbd3-0604-495c-bf08-07ff31f26a2a
 
 # Building
 
