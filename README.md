@@ -8,7 +8,7 @@ This is in an effort to maximise performance of both updates to the game / physi
 
 Oh, and while we have experienced great success along the way, at the moment it's only rendering a single triangle and applying some very basic transformations every frame, so you'll have to use your imagination to think what game to build on top of this!
 
-### But look how smooth! (minus some ScreenToGif recording lag :D)
+### But look how smooth!
 
 https://github.com/user-attachments/assets/a37dbbd3-0604-495c-bf08-07ff31f26a2a
 
