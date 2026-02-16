@@ -1,10 +1,10 @@
 #include <stdexcept>
 
-#include "render_command_buffer.h"
+#include "render_frame_buffer.h"
 
 namespace dx11_async_render
 {
-    void RenderCommandBuffer::allocate(size_t capacity)
+    void RenderFrameBuffer::allocate(size_t capacity)
     {
         if ( ( capacity & (capacity - 1) ) != 0)
             throw std::runtime_error("Capacity must be a power of 2!");
@@ -12,7 +12,7 @@ namespace dx11_async_render
         m_data.resize(capacity);
     }
 
-    bool RenderCommandBuffer::push(const RenderCommand& command) {
+    bool RenderFrameBuffer::push(const RenderFrame& frame) {
         const size_t current_tail   = m_tail.load(std::memory_order_relaxed);
         const size_t next_tail      = (current_tail + 1) & (m_data.size() - 1);
 
@@ -21,7 +21,7 @@ namespace dx11_async_render
             return false;
         }
 
-        m_data[current_tail] = command;
+        m_data[current_tail] = frame;
 
         // Release: ensure data write finishes before tail update is visible
         m_tail.store(next_tail, std::memory_order_release);
@@ -29,7 +29,7 @@ namespace dx11_async_render
         return true;
     }
 
-    bool RenderCommandBuffer::pop(RenderCommand& command)
+    bool RenderFrameBuffer::pop(RenderFrame** frame)
     {
         const size_t current_head = m_head.load(std::memory_order_relaxed);
 
@@ -38,10 +38,16 @@ namespace dx11_async_render
             return false;
         }
 
-        command = m_data[current_head];
+        *frame = &m_data[current_head];
+
         // Release: ensure data read finishes before head update is visible
         m_head.store((current_head + 1) & (m_data.size() - 1), std::memory_order_release);
 
         return true;
+    }
+
+    const std::vector<RenderFrame>& RenderFrameBuffer::getData() const
+    {
+        return m_data;
     }
 }

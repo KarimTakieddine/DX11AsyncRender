@@ -1,15 +1,17 @@
 #include "d3d11_render_batch.h"
 #include "platform.h"
-#include "render_command_buffer.h"
+#include "render_frame_buffer.h"
 #include "renderer.h"
 #include "win32_window.h"
 
+#include <iostream>
+
 namespace dx11_async_render
 {
-	void Renderer::run(Win32Window* window, RenderCommandBuffer* commandBuffer, const GraphicsConfig& config)
+	void Renderer::run(Win32Window* window, RenderFrameBuffer* frameBuffer, const GraphicsConfig& config)
 	{
 		m_window		= window;
-		m_commandBuffer = commandBuffer;
+		m_frameBuffer	= frameBuffer;
 		m_runThread		= std::thread(&Renderer::execute, this, window->getHandle(), config);
 	}
 
@@ -88,20 +90,18 @@ namespace dx11_async_render
 
 			renderBatch.use();
 
-			/*RenderCommand renderCommand = { };
-			while (m_commandBuffer->pop(renderCommand))
+			// TODO(Karim): Use 64-byte aligned data blocks to ensure we aren't invalidating CPU cache and vice-versa
+
+			RenderFrame* renderFrame{ nullptr };
+			if (m_frameBuffer->pop(&renderFrame))
 			{
-				renderBatch.setTransformData(renderCommand.modelMatrix);
+				for (const auto& command : renderFrame->getRenderCommands())
+				{
+					renderBatch.setTransformData(command.modelMatrix);
 
-				m_graphicsDevice->getContext()->Draw(3, 0);
-			}*/
-
-			transform.setLocalScale({ 0.25f, 0.25f, 1.0f });
-			transform.translate(displacement);
-			transform.recalculateModelMatrix();
-			renderBatch.setTransformData(transform.getModelMatrix());
-
-			m_graphicsDevice->getContext()->Draw(3, 0);
+					m_graphicsDevice->getContext()->Draw(3, 0);
+				}
+			}
 
 			m_graphicsDevice->getSwapChain()->Present(1, 0);
 
@@ -109,15 +109,39 @@ namespace dx11_async_render
 			if (m_graphicsDevice->getSwapChain()->GetFrameStatistics(&frameStatistics) == S_OK)
 				m_frameTimer.end = frameStatistics.SyncQPCTime.QuadPart;
 
-			double frameDeltaTime = platformGetElapsedSeconds(m_frameTimer);
-
-			displacement.x += 0.125 * frameDeltaTime;
+			m_frameDeltaTime.store(platformGetElapsedSeconds(m_frameTimer), std::memory_order_release);
 
 			m_frameTimer.start = m_frameTimer.end;
 
 			m_renderedFrameCount.store(
 				m_renderedFrameCount.load(std::memory_order_relaxed) + 1,
 				std::memory_order_release);
+
+			m_renderedFrameCount.notify_one();
 		}
+	}
+
+	uint64_t Renderer::getRenderedFrameCount() const
+	{
+		return m_renderedFrameCount.load(std::memory_order_acquire);
+	}
+
+	double Renderer::waitOnFrameCount(uint64_t count)
+	{
+		uint64_t renderedFrameCount = m_renderedFrameCount.load(std::memory_order_relaxed);
+
+		while (count > renderedFrameCount)
+		{
+			m_renderedFrameCount.wait(renderedFrameCount, std::memory_order_acquire);
+
+			renderedFrameCount = m_renderedFrameCount.load(std::memory_order_relaxed);
+		}
+
+		return getFrameDeltaTime();
+	}
+
+	double Renderer::getFrameDeltaTime() const
+	{
+		return m_frameDeltaTime.load(std::memory_order_acquire);
 	}
 }
