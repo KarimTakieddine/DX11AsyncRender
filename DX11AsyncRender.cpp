@@ -1,5 +1,6 @@
 #include "bump_allocator.hpp"
 #include "d3d11_transform.h"
+#include "render_command_buffer.h"
 #include "renderer.h"
 #include "win32_window.h"
 
@@ -14,8 +15,11 @@ int main()
     window.show();
     window.update();
 
+    dx11_async_render::RenderCommandBuffer renderCommandBuffer;
+    renderCommandBuffer.allocate(64);
+
     dx11_async_render::Renderer renderer;
-    renderer.run(&window, { 1920U, 1080U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
+    renderer.run(&window, &renderCommandBuffer, { 1920U, 1080U, 60U, DXGI_FORMAT_R8G8B8A8_UNORM });
 
     bool shouldRun{ true };
 
@@ -45,11 +49,13 @@ int main()
         // Update frame n
         // Submit commands for frame n
 
-        displacement.x += 0.016f; // TODO: Replace with real framerate
+        displacement.x += 0.000016f; // TODO: Replace with real framerate
 
         transformObject->setLocalScale({ 0.25f, 0.25f, 1.0f });
         transformObject->translate(displacement);
         transformObject->recalculateModelMatrix();
+
+        // while(!renderCommandBuffer.push( { transformObject->getModelMatrix() }));
     }
 
     renderer.stop();

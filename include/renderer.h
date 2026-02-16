@@ -13,6 +13,7 @@
 namespace dx11_async_render
 {
 	class Win32Window;
+	class RenderCommandBuffer;
 
 	class Renderer
 	{
@@ -22,7 +23,7 @@ namespace dx11_async_render
 		Renderer(const Renderer&) = delete;
 		Renderer& operator=(const Renderer&) = delete;
 
-		void run(Win32Window* window, const GraphicsConfig& config);
+		void run(Win32Window* window, RenderCommandBuffer* commandBuffer, const GraphicsConfig& config);
 		void stop();
 
 	private:
@@ -34,6 +35,7 @@ namespace dx11_async_render
 		std::unique_ptr<GraphicsDevice> m_graphicsDevice{ nullptr };
 		std::unique_ptr<D3D11ShaderStore> m_shaderStore	{ nullptr };
 		Win32Window* m_window							{ nullptr };
+		RenderCommandBuffer* m_commandBuffer			{ nullptr };
 		std::atomic<uint64_t> m_renderedFrameCount		{ 0 };
 		std::atomic<bool> m_shouldRun					{ true };
 	};

@@ -19,7 +19,7 @@ namespace dx11_async_render
 		void setPixelShader(D3D11PixelShader* shader);
 
 		bool initialize();
-		bool setTransformData(const D3D11Transform& transform);
+		bool setTransformData(const DirectX::XMMATRIX& data);
 		bool use();
 
 	private:

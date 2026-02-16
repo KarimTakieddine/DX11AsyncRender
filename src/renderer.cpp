@@ -1,14 +1,16 @@
 #include "d3d11_render_batch.h"
 #include "platform.h"
+#include "render_command_buffer.h"
 #include "renderer.h"
 #include "win32_window.h"
 
 namespace dx11_async_render
 {
-	void Renderer::run(Win32Window* window, const GraphicsConfig& config)
+	void Renderer::run(Win32Window* window, RenderCommandBuffer* commandBuffer, const GraphicsConfig& config)
 	{
-		m_window	= window;
-		m_runThread = std::thread(&Renderer::execute, this, window->getHandle(), config);
+		m_window		= window;
+		m_commandBuffer = commandBuffer;
+		m_runThread		= std::thread(&Renderer::execute, this, window->getHandle(), config);
 	}
 
 	void Renderer::stop()
@@ -85,10 +87,19 @@ namespace dx11_async_render
 				clearColor);
 
 			renderBatch.use();
+
+			/*RenderCommand renderCommand = { };
+			while (m_commandBuffer->pop(renderCommand))
+			{
+				renderBatch.setTransformData(renderCommand.modelMatrix);
+
+				m_graphicsDevice->getContext()->Draw(3, 0);
+			}*/
+
 			transform.setLocalScale({ 0.25f, 0.25f, 1.0f });
 			transform.translate(displacement);
 			transform.recalculateModelMatrix();
-			renderBatch.setTransformData(transform);
+			renderBatch.setTransformData(transform.getModelMatrix());
 
 			m_graphicsDevice->getContext()->Draw(3, 0);
 

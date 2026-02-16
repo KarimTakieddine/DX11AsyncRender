@@ -33,10 +33,14 @@ namespace dx11_async_render
 		if (!m_graphicsDevice || !m_vertexShader || !m_pixelShader)
 			return false;
 
+		// TODO(Karim): Replace with mesh data (dynamic)
+
+		const float aspectRatio = 1920.0f / 1080;
+
 		D3D11Vertex vertices[] = {
-			{ { 0.0f,  0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f } },	// Top (Red)
-			{ {  0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } }, // Right (Green)
-			{ { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f} }	// Left (Blue)
+			{ { 0.0f, 0.5f * aspectRatio, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },					// Top (Red)
+			{ {  aspectRatio * 0.5f, -aspectRatio * 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },	// Right (Green)
+			{ { -aspectRatio * 0.5f, -aspectRatio * 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f} }	// Left (Blue)
 		};
 
 		D3D11_BUFFER_DESC vertexBufferDesc = {
@@ -93,7 +97,7 @@ namespace dx11_async_render
 		return true;
 	}
 
-	bool D3D11RenderBatch::setTransformData(const D3D11Transform& transform)
+	bool D3D11RenderBatch::setTransformData(const DirectX::XMMATRIX& data)
 	{
 		if (!m_graphicsDevice || !m_transformBuffer)
 			return false;
@@ -104,7 +108,7 @@ namespace dx11_async_render
 			return false;
 
 		TransformBuffer* mappedData = (TransformBuffer*)mappedResource.pData;
-		mappedData->modelMatrix		= transform.getModelMatrix();
+		mappedData->modelMatrix		= data;
 
 		m_graphicsDevice->getContext()->Unmap(m_transformBuffer.Get(), 0);
 
