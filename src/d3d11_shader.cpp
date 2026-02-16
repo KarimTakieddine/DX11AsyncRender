@@ -7,7 +7,7 @@
 #include "d3d11_shader.h"
 #include "platform.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	bool D3D11Shader::load(ID3D11Device* device, const std::string& file)
 	{

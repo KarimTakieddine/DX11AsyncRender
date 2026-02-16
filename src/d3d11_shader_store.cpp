@@ -1,6 +1,6 @@
 #include "d3d11_shader_store.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	bool D3D11ShaderStore::addVertexShader(const std::string& name, std::unique_ptr<D3D11VertexShader> shader)
 	{

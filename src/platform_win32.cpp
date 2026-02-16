@@ -21,7 +21,7 @@ namespace
 	}
 }
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	bool platformStartTime(Timer& timer)
 	{

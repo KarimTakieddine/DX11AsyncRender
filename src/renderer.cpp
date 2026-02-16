@@ -3,7 +3,7 @@
 #include "renderer.h"
 #include "win32_window.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	void Renderer::run(Win32Window* window, const GraphicsConfig& config)
 	{

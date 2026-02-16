@@ -14,9 +14,9 @@ namespace
     */
     static HINSTANCE applicationInstance = GetModuleHandle(NULL);
 
-    airful_engine::Win32Window* getWindow(LPARAM lParam)
+    dx11_async_render::Win32Window* getWindow(LPARAM lParam)
     {
-       return (airful_engine::Win32Window*)( (CREATESTRUCT*)lParam )->lpCreateParams;
+       return (dx11_async_render::Win32Window*)( (CREATESTRUCT*)lParam )->lpCreateParams;
     }
 
     LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -29,7 +29,7 @@ namespace
         }
         case WM_SIZE:
         {
-            auto* window = (airful_engine::Win32Window*)GetWindowLongPtrA(hWnd, 0);
+            auto* window = (dx11_async_render::Win32Window*)GetWindowLongPtrA(hWnd, 0);
             window->handleResize(LOWORD(lParam), HIWORD(lParam));
             return 0;
         }
@@ -45,7 +45,7 @@ namespace
     }
 }
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	Win32Window::Win32Window(const char* title, int width, int height)
 	{

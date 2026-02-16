@@ -5,7 +5,7 @@
 
 #include "d3d11_transform.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	class GraphicsDevice;
 	class D3D11VertexShader;

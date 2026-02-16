@@ -5,7 +5,7 @@
 
 #include "d3d11_shader.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	class D3D11ShaderStore
 	{

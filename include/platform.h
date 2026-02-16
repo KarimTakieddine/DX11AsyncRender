@@ -2,7 +2,7 @@
 
 #include "timer.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	extern "C" bool platformStartTime(Timer& timer);
 	extern "C" bool platformEndTime(Timer& timer);

@@ -4,7 +4,7 @@
 
 #include <dxgidebug.h>
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	GraphicsDevice::GraphicsDevice(HWND window, const GraphicsConfig& config)
 	{

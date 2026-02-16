@@ -11,7 +11,7 @@ namespace
 	};
 }
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	void D3D11RenderBatch::setGraphicsDevice(GraphicsDevice* device)
 	{

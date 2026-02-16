@@ -1,6 +1,6 @@
 #include "d3d11_transform.h"
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	DirectX::XMFLOAT3 D3D11Transform::getLocalScale() const
 	{

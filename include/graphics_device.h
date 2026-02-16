@@ -8,7 +8,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	class GraphicsDevice
 	{

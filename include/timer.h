@@ -1,6 +1,6 @@
 #pragma once
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	extern "C" struct Timer
 	{

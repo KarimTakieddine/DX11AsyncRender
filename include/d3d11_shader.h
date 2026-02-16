@@ -9,7 +9,7 @@ struct ID3D11Device;
 struct ID3D11VertexShader;
 struct ID3D11PixelShader;
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	class D3D11Shader
 	{

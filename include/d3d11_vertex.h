@@ -2,7 +2,7 @@
 
 #include <DirectXMath.h>
 
-namespace airful_engine
+namespace dx11_async_render
 {
 	struct D3D11Vertex
 	{
