@@ -4,7 +4,21 @@ A multithreaded, Windows console application demonstrating asynchronous pipelini
 
 This is in an effort to maximise performance of both updates to the game / physics state and frame presentation, while smoothing out visual glitches, tearing and/or jitter resulting from inconsistencies in naive frame time sampling.
 
-## **_Note_**
+## Technical Overview
+
+### CPU throttling controlled by queued frame buffer depth
+
+At the start of each loop iteration, the main UI / Windowing thread (after draining the Windows message queue and events within) waits for frame n - maxQueuedFrames (left as a locally-scoped constant for simplicity) to be swapped by the asynchronous rendering logic. This allows pacing of updates such that they do not run too far ahead of the rendering thread and risk of overruning the shared frame buffer's data while it is still being rendered, as well as ensure consistent updates and prevent accumulation of updates prior to rendering a given frame, leading to "jerky" linear-time transformations.
+
+### Wait-free ring buffer of shared frame data
+
+In this SPSC (single-producer-single-consumer) scenario, predictable time access into a shared frame buffer allows for maximum CPU throughput (in addition to being separated from asynchronous rendering logic) and and avoiding locking overhead / resource contention around access to a given frame's data. This also allows signalling to occur across thread boundaries without significantly slowing down the renderer.
+
+### Frame time smoothing
+
+Frame delta time is set atomically prior to each signal from the rendering thread that "work is done". Coupled with precise frame swap timestamps obtained by API-specific call (the equivalent in OpenGL would be using something like a `GLQuery` timer query or a `GLFence` object to obtain the specific swap time), this allows micro variations in frame-to-frame delta time to be absorbed, even in cases of a spike in execution time of CPU-side logic (provided they don't become the norm).
+
+### **_Note_**
 
 Oh, and while we have experienced great success along the way, at the moment it's only rendering a single triangle and applying some very basic transformations every frame, so you'll have to use your imagination to think what game to build on top of this!
 
