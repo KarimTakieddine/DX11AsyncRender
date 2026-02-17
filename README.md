@@ -4,6 +4,12 @@ A multithreaded, Windows console application demonstrating asynchronous pipelini
 
 This is in an effort to maximise performance of both updates to the game / physics state and frame presentation, while smoothing out visual glitches, tearing and/or jitter resulting from inconsistencies in naive frame time sampling.
 
+### **_Note_**
+
+Evidently, this is a very basic code sample and for obvious reasons is probably a far cry from what Unity Technologies actually employ as an algorithm. That being said, the general problem of "judder" when making games and graphics simulations has been living rent-free in my head for almost the past decade, whether when using commercial engines like Unity, Unreal or while developing my own custom engine(s). The article referenced below provided a great source of inspiration and desire to make more performant and polished products as an independent developer.
+
+At the time of writing, Unity likely is leveraging the latest features of DirectX 12 to employ a more sophisticated and hardware-scalable deferred GPU command buffer submission architecture, offering opportunities for greater pipelining by splitting rendering logic into further stages.
+
 ## Technical Overview
 
 ### CPU throttling controlled by queued frame buffer depth
