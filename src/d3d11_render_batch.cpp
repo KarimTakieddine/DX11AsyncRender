@@ -1,6 +1,6 @@
 #include "d3d11_render_batch.h"
 #include "d3d11_shader.h"
-#include "d3d11_vertex.h"
+#include "vertex.h"
 #include "graphics_device.h"
 
 namespace
@@ -35,12 +35,11 @@ namespace dx11_async_render
 
 		// TODO(Karim): Replace with mesh data (dynamic)
 
-		const float aspectRatio = 1920.0f / 1080;
-
-		D3D11Vertex vertices[] = {
-			{ { 0.0f, 0.5f * aspectRatio, 0.0f}, {1.0f, 0.0f, 0.0f, 1.0f} },					// Top (Red)
-			{ {  aspectRatio * 0.5f, -aspectRatio * 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f } },	// Right (Green)
-			{ { -aspectRatio * 0.5f, -aspectRatio * 0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f} }	// Left (Blue)
+		Vertex vertices[] = {
+			{ { -0.5f, 0.5f, 0.0f }, { 1.0f, 0.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },	// Top-left (Red)
+			{ { 0.5f, 0.5f, 0.0f }, { 0.0f, 1.0f, 0.0f, 1.0f }, { 0.0f, 0.0f } },	// Top-right (Green)
+			{ { 0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } },	// Bottom-right (Blue)
+			{ { -0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f } }	// Bottom-left (White)
 		};
 
 		D3D11_BUFFER_DESC vertexBufferDesc = {
@@ -49,11 +48,26 @@ namespace dx11_async_render
 			.BindFlags	= D3D11_BIND_VERTEX_BUFFER
 		};
 
+		unsigned int indices[] = { 0, 1, 2, 0, 2, 3 }; // clockwise winding order
+
+		D3D11_BUFFER_DESC elementBufferDesc = {
+			.ByteWidth	= sizeof(indices),
+			.Usage		= D3D11_USAGE_IMMUTABLE,
+			.BindFlags	= D3D11_BIND_INDEX_BUFFER
+		};
+
 		D3D11_SUBRESOURCE_DATA vertexBufferData = {
 			.pSysMem = vertices
 		};
 
 		if (m_graphicsDevice->getDevice()->CreateBuffer(&vertexBufferDesc, &vertexBufferData, &m_vertexBuffer) != S_OK)
+			return false;
+
+		D3D11_SUBRESOURCE_DATA indexBufferData = {
+			.pSysMem = indices
+		};
+
+		if (m_graphicsDevice->getDevice()->CreateBuffer(&elementBufferDesc, &indexBufferData, &m_indexBuffer) != S_OK)
 			return false;
 
 		D3D11_INPUT_ELEMENT_DESC layoutDesc[] = {
@@ -67,6 +81,12 @@ namespace dx11_async_render
 				"COLOR", 0,							// Semantic Name and Index
 				DXGI_FORMAT_R32G32B32A32_FLOAT,     // Format (4 floats)
 				0, D3D11_APPEND_ALIGNED_ELEMENT,	// Offset automatically follows Position
+				D3D11_INPUT_PER_VERTEX_DATA, 0
+			},
+			{
+				"UV", 0,							// Semantic Name and Index
+				DXGI_FORMAT_R32G32_FLOAT,			// Format (2 floats)
+				0, D3D11_APPEND_ALIGNED_ELEMENT,	// Offset automatically follows Color
 				D3D11_INPUT_PER_VERTEX_DATA, 0
 			}
 		};
@@ -117,7 +137,7 @@ namespace dx11_async_render
 
 	bool D3D11RenderBatch::use()
 	{
-		if (!m_vertexBuffer || !m_inputLayout)
+		if (!m_vertexBuffer || !m_indexBuffer || !m_inputLayout)
 			return false;
 
 		/*
@@ -128,10 +148,11 @@ namespace dx11_async_render
 		* of a vertex buffer and the first element that will be used.
 		*/
 
-		UINT stride = sizeof(D3D11Vertex);
+		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
 		m_graphicsDevice->getContext()->IASetVertexBuffers(0, 1, m_vertexBuffer.GetAddressOf(), &stride, &offset);
+		m_graphicsDevice->getContext()->IASetIndexBuffer(m_indexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		m_graphicsDevice->getContext()->IASetInputLayout(m_inputLayout.Get());
 		m_graphicsDevice->getContext()->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		m_graphicsDevice->getContext()->VSSetShader(m_vertexShader->getHandle().Get(), nullptr, 0);

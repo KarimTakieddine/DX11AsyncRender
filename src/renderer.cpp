@@ -99,7 +99,7 @@ namespace dx11_async_render
 				{
 					renderBatch.setTransformData(command.modelMatrix);
 
-					m_graphicsDevice->getContext()->Draw(3, 0);
+					m_graphicsDevice->getContext()->DrawIndexed(6, 0, 0);
 				}
 			}
 

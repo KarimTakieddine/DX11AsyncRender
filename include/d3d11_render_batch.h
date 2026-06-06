@@ -24,6 +24,7 @@ namespace dx11_async_render
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_vertexBuffer		{ nullptr };
+		Microsoft::WRL::ComPtr<ID3D11Buffer> m_indexBuffer		{ nullptr };
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_transformBuffer	{ nullptr };
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> m_inputLayout	{ nullptr };
 		GraphicsDevice* m_graphicsDevice						{ nullptr };
